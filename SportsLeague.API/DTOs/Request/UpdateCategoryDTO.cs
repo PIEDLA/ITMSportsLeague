@@ -1,7 +1,7 @@
 ﻿using SportsLeague.Domain.Enums;
 namespace SportsLeague.API.DTOs.Request;
 
-public class UpdateStatusDTO
+public class UpdateCategoryDTO
 {
-    public TournamentStatus Status { get; set; }
+    public SponsorCategory Category { get; set; }
 }
