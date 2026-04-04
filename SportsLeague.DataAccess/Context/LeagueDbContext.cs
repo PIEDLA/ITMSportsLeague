@@ -313,7 +313,9 @@ public class LeagueDbContext : DbContext
 
             entity.HasKey(ts => ts.Id);
 
-            entity.Property(tt => tt.ContractAmount)
+            entity.Property(ts => ts.ContractAmount)
+
+            .HasPrecision(18, 2)
 
             .IsRequired();
 

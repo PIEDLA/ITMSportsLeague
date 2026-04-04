@@ -248,8 +248,8 @@ public class TournamentService : ITournamentService
         }
 
         // Validar que el patrocinador existe
-        var teamExists = await _teamRepository.ExistsAsync(sponsorId);
-        if (!teamExists)
+        var sponsorExists = await _sponsorRepository.ExistsAsync(sponsorId);
+        if (!sponsorExists)
             throw new KeyNotFoundException(
             $"No se encontró el patrocinador con ID {sponsorId}");
 
