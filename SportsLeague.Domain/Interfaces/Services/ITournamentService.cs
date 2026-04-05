@@ -10,11 +10,12 @@ public interface ITournamentService
     Task<Tournament> CreateAsync(Tournament tournament);
     Task UpdateAsync(int id, Tournament tournament);
     Task DeleteAsync(int id);
+    Task DeleteContractWithSponsorAsync(int id, int sponsorId);
     Task UpdateStatusAsync(int id, TournamentStatus newStatus);
     Task UpdateContractAmountAsync(int id, int sponsorId, decimal contractAmount);
     Task UpdateSponsorCategoryAsync(int id, int sponsorId, SponsorCategory category);
     Task RegisterTeamAsync(int tournamentId, int teamId);
     Task RegisterSponsorAsync(int tournamentId, int sponsorId, decimal contractAmount, SponsorCategory category);
     Task<IEnumerable<Team>> GetTeamsByTournamentAsync(int tournamentId);
-    Task<IEnumerable<Sponsor>> GetSponsorsByTournamentAsync(int tournamentId);
+    Task<IEnumerable<TournamentSponsor>> GetSponsorsByTournamentAsync(int tournamentId);
 }

@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using SportsLeague.Domain.Entities;
-using SportsLeague.Domain.Enums;
 using SportsLeague.Domain.Interfaces.Repositories;
 using SportsLeague.Domain.Interfaces.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace SportsLeague.Domain.Services;
 
@@ -48,6 +48,17 @@ public class SponsorService : ISponsorService
             _logger.LogWarning("Sponsor with name '{SponsorName}' already exists", sponsor.Name);
             throw new InvalidOperationException(
             $"Ya existe un patrocinador con el nombre '{sponsor.Name}'");
+        }
+
+        // Validación de negocio: formato de email
+        var emailValidator = new EmailAddressAttribute();
+
+        if (!string.IsNullOrEmpty(sponsor.ContactEmail) &&
+            !emailValidator.IsValid(sponsor.ContactEmail))
+        {
+            _logger.LogWarning("Invalid email format for sponsor: {SponsorName}", sponsor.Name);
+            throw new InvalidOperationException(
+                $"El correo '{sponsor.ContactEmail}' no tiene un formato válido");
         }
 
         _logger.LogInformation("Creating sponsor: {SponsorName}", sponsor.Name);

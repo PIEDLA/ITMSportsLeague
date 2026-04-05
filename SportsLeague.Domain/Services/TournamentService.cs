@@ -38,7 +38,7 @@ public class TournamentService : ITournamentService
     public async Task<Tournament?> GetByIdAsync(int id)
     {
         _logger.LogInformation("Retrieving tournament with ID: {TournamentId}", id);
-        var tournament = await _tournamentRepository.GetByIdWithTeamsAsync(id);
+        var tournament = await _tournamentRepository.GetByIdWithTeamsAndSponsorsAsync(id);
         if (tournament == null)
             _logger.LogWarning("Tournament with ID {TournamentId} not found", id);
         return tournament;
@@ -98,6 +98,29 @@ public class TournamentService : ITournamentService
 
         _logger.LogInformation("Deleting tournament with ID: {TournamentId}", id);
         await _tournamentRepository.DeleteAsync(id);
+    }
+    public async Task DeleteContractWithSponsorAsync(int id, int sponsorId)
+    {
+        var existing = await _tournamentRepository.GetByIdAsync(id);
+        if (existing == null)
+            throw new KeyNotFoundException($"No se encontró el torneo con ID {id}");
+        if (existing.Status != TournamentStatus.Pending)
+        {
+            throw new InvalidOperationException(
+            "Solo se pueden eliminar torneos en estado Pending");
+        }
+
+        // Validar que esté inscrito el patrocinador
+        var existingS = await _tournamentSponsorRepository
+        .GetByTournamentAndSponsorAsync(id, sponsorId);
+        if (existingS == null)
+        {
+            throw new InvalidOperationException(
+            "Este patrocinador no está inscrito en el torneo");
+        }
+
+        _logger.LogInformation("Deleting sponsor with ID: {SponsorId} from tournament with ID: {TournamentId}", sponsorId, id);
+        await _tournamentSponsorRepository.DeleteAsync(existingS.Id);
     }
 
     public async Task UpdateStatusAsync(int id, TournamentStatus newStatus)
@@ -290,7 +313,7 @@ public class TournamentService : ITournamentService
         return tournamentTeams.Select(tt => tt.Team);
     }
 
-    public async Task<IEnumerable<Sponsor>> GetSponsorsByTournamentAsync(int tournamentId)
+    public async Task<IEnumerable<TournamentSponsor>> GetSponsorsByTournamentAsync(int tournamentId)
     {
         var tournament = await _tournamentRepository.GetByIdAsync(tournamentId);
         if (tournament == null)
@@ -300,6 +323,6 @@ public class TournamentService : ITournamentService
         var tournamentSponsor = await _tournamentSponsorRepository
         .GetByTournamentAsync(tournamentId);
 
-        return tournamentSponsor.Select(ts => ts.Sponsor);
+        return tournamentSponsor;
     }
 }

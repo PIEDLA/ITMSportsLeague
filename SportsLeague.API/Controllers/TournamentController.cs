@@ -79,6 +79,18 @@ public class TournamentController : ControllerBase
         catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); }
     }
 
+    [HttpDelete("{id}/sponsor")]
+    public async Task<ActionResult> TerminateContractWithSponsors(int id, int sponsorId)
+    {
+        try
+        {
+            await _tournamentService.DeleteContractWithSponsorAsync(id, sponsorId);
+            return NoContent();
+        }
+        catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        catch (InvalidOperationException ex) { return Conflict(new { message = ex.Message }); }
+    }
+
     [HttpPatch("{id}/status")]
     public async Task<ActionResult> UpdateStatus(int id, UpdateStatusDTO dto)
     {
@@ -151,12 +163,12 @@ public class TournamentController : ControllerBase
     }
 
     [HttpGet("{id}/sponsor")]
-    public async Task<ActionResult<IEnumerable<SponsorResponseDTO>>> GetSponsors(int id)
+    public async Task<ActionResult<IEnumerable<SponsorForTournamentsResponseDTO>>> GetSponsors(int id)
     {
         try
         {
             var sponsors = await _tournamentService.GetSponsorsByTournamentAsync(id);
-            return Ok(_mapper.Map<IEnumerable<SponsorResponseDTO>>(sponsors));
+            return Ok(_mapper.Map<IEnumerable<SponsorForTournamentsResponseDTO>>(sponsors));
         }
         catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
     }
